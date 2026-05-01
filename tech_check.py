@@ -4,22 +4,21 @@ Tech Check newsletter generator.
 Can be run directly (CLI) or imported by app.py for the web UI.
 """
 
+import base64
 import os
 import re
-import smtplib
+import urllib.parse
 import urllib.request
 import urllib.error
 import json
 import xml.etree.ElementTree as ET
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 from email.utils import parsedate_to_datetime
 from datetime import datetime, timezone, timedelta
 
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
-SMTP_USER = os.environ.get("SMTP_USER", "")
-SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
-RECIPIENT_EMAIL = "sujathom@gmail.com"
+MAILGUN_API_KEY = os.environ.get("MAILGUN_API_KEY", "")
+MAILGUN_DOMAIN = os.environ.get("MAILGUN_DOMAIN", "")
+RECIPIENT_EMAIL = "hanielthomson@gmail.com"
 DEFAULT_MODEL = "openai/gpt-oss-120b:free"
 
 RSS_FEEDS = {
@@ -272,26 +271,37 @@ def build_email_html(content: str) -> str:
 </html>"""
 
 
-def send_email(subject: str, html_body: str, smtp_user: str = None, smtp_password: str = None, recipient: str = None) -> None:
-    _user = smtp_user or SMTP_USER
-    _pass = smtp_password or SMTP_PASSWORD
+def send_email(subject: str, html_body: str, recipient: str = None) -> None:
     _to = recipient or RECIPIENT_EMAIL
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"] = _user
-    msg["To"] = _to
-    msg.attach(MIMEText(html_body, "html"))
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(_user, _pass)
-        server.sendmail(_user, _to, msg.as_string())
+    data = urllib.parse.urlencode({
+        "from": f"TS Weekly <mailgun@{MAILGUN_DOMAIN}>",
+        "to": _to,
+        "subject": subject,
+        "html": html_body,
+    }).encode("utf-8")
+    credentials = base64.b64encode(f"api:{MAILGUN_API_KEY}".encode()).decode()
+    req = urllib.request.Request(
+        f"https://api.mailgun.net/v3/{MAILGUN_DOMAIN}/messages",
+        data=data,
+        headers={
+            "Authorization": f"Basic {credentials}",
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        method="POST",
+    )
+    with urllib.request.urlopen(req) as resp:
+        result = json.loads(resp.read().decode())
+    print(f"[{datetime.now().isoformat()}] Mailgun response: {result}")
 
 
 def run_newsletter(model: str = None, editorial: str = None, recipient: str = None) -> None:
     """Entry point for both CLI and web UI."""
     if not OPENROUTER_API_KEY:
         raise RuntimeError("OPENROUTER_API_KEY is not set")
-    if not SMTP_USER or not SMTP_PASSWORD:
-        raise RuntimeError("SMTP_USER or SMTP_PASSWORD is not set")
+    if not MAILGUN_API_KEY:
+        raise RuntimeError("MAILGUN_API_KEY is not set")
+    if not MAILGUN_DOMAIN:
+        raise RuntimeError("MAILGUN_DOMAIN is not set")
 
     print(f"[{datetime.now().isoformat()}] Fetching RSS articles from the last 6 days...")
     articles = fetch_rss_articles(days=6)
@@ -308,8 +318,9 @@ def run_newsletter(model: str = None, editorial: str = None, recipient: str = No
     subject = f"TS Weekly — Tech Check | {datetime.now().strftime('%b %d, %Y')}"
     html = build_email_html(content)
 
-    print(f"[{datetime.now().isoformat()}] Sending email to {recipient or RECIPIENT_EMAIL}...")
-    send_email(subject, html, recipient=recipient)
+    _recipient = recipient or RECIPIENT_EMAIL
+    print(f"[{datetime.now().isoformat()}] Sending email to {_recipient}...")
+    send_email(subject, html, recipient=_recipient)
     print(f"[{datetime.now().isoformat()}] Done.")
 
 

@@ -507,23 +507,46 @@ async function saveConfig() {
 }
 
 // ── Run now ──────────────────────────────────────────────────────────────────
+let _runPoller = null;
+
 async function runNow() {
   const btn = document.getElementById('btn-run');
   setLoading(btn, true);
-  showStatus('info', '⏳ Newsletter running…');
+  showStatus('info', '⏳ Starting…');
   try {
     const res = await fetch('/api/run', { method:'POST' });
     const data = await res.json();
-    setLoading(btn, false);
+    if (data.status === 'already_running') {
+      setLoading(btn, false);
+      showStatus('info', '⏳ Already running — check log below');
+      return;
+    }
     if (data.status === 'started') {
       showStatus('info', '⏳ Running — check log below');
-    } else if (data.status === 'already_running') {
-      showStatus('warn', '⚠ Already running');
+      _runPoller = setInterval(pollRunState, 2000);
     }
   } catch(e) {
     setLoading(btn, false);
     showStatus('err', 'Failed to start');
   }
+}
+
+async function pollRunState() {
+  try {
+    const res = await fetch('/api/run-state');
+    const data = await res.json();
+    if (data.status === 'done') {
+      clearInterval(_runPoller);
+      _runPoller = null;
+      setLoading(document.getElementById('btn-run'), false);
+      showStatus('ok', '✓ Email sent successfully');
+    } else if (data.status === 'failed') {
+      clearInterval(_runPoller);
+      _runPoller = null;
+      setLoading(document.getElementById('btn-run'), false);
+      showStatus('err', `✗ Failed: ${data.error || 'unknown error'}`);
+    }
+  } catch(_) {}
 }
 
 // ── Log polling ──────────────────────────────────────────────────────────────

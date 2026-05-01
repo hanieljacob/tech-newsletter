@@ -51,11 +51,12 @@ DEFAULT_CONFIG = {
     "day_of_week": "sun",
     "hour": 21,
     "minute": 0,
-    "recipient": "sujathom@gmail.com",
+    "recipient": "hanielthomson@gmail.com",
 }
 
 scheduler = BackgroundScheduler(timezone="America/New_York")
 _run_lock = threading.Lock()
+_run_state = {"status": "idle", "error": None}  # idle | running | done | failed
 
 
 # ── Config helpers ──────────────────────────────────────────────────────────
@@ -153,6 +154,8 @@ def api_run():
         return jsonify({"status": "already_running"}), 409
 
     cfg = load_config()
+    _run_state["status"] = "running"
+    _run_state["error"] = None
 
     def _run():
         try:
@@ -161,13 +164,21 @@ def api_run():
                 editorial=cfg.get("prompt"),
                 recipient=cfg.get("recipient"),
             )
+            _run_state["status"] = "done"
         except Exception as e:
+            _run_state["status"] = "failed"
+            _run_state["error"] = str(e)
             print(f"[{datetime.now().isoformat()}] Manual run failed: {e}")
         finally:
             _run_lock.release()
 
     threading.Thread(target=_run, daemon=True).start()
     return jsonify({"status": "started"})
+
+
+@app.route("/api/run-state")
+def api_run_state():
+    return jsonify(_run_state)
 
 
 @app.route("/api/logs")
