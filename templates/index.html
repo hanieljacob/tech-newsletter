@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TS Weekly — Tech Check Config</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #1a1a2e;
+      --navy-light: #252545;
+      --accent: #4f8ef7;
+      --accent-hover: #3a7ae8;
+      --success: #22c55e;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --text: #111827;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --bg: #f8f9fb;
+      --card: #ffffff;
+      --radius: 12px;
+      --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ── Header ── */
+    .masthead {
+      background: var(--navy);
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 0 rgba(255,255,255,.06);
+    }
+    .masthead-brand {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .masthead-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: .3px;
+    }
+    .masthead-sub {
+      font-size: 11px;
+      font-weight: 400;
+      color: rgba(255,255,255,.4);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .masthead-pill {
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255,255,255,.5);
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 20px;
+      padding: 3px 10px;
+    }
+
+    /* ── Layout ── */
+    .page { max-width: 960px; margin: 0 auto; padding: 32px 24px 64px; }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .col-full { grid-column: 1 / -1; }
+
+    @media (max-width: 680px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .masthead { padding: 0 20px; }
+      .page { padding: 20px 16px 48px; }
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 24px;
+    }
+    .card-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .card-label::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 12px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    /* ── Form elements ── */
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    select, input[type="text"], input[type="email"], input[type="number"], textarea {
+      width: 100%;
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      color: var(--text);
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      appearance: none;
+    }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+    select:focus, input:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79,142,247,.12);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 220px;
+      line-height: 1.6;
+      font-size: 13px;
+    }
+    .field { margin-bottom: 16px; }
+    .field:last-child { margin-bottom: 0; }
+
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .row-3 { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; }
+
+    /* ── Model search ── */
+    .model-search-wrap { position: relative; }
+    .model-search-wrap input { margin-bottom: 8px; }
+    #model-select { font-size: 13px; }
+    .model-count {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* ── Actions bar ── */
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      padding: 9px 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background .15s, transform .1s, box-shadow .15s;
+      white-space: nowrap;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 1px 3px rgba(79,142,247,.3);
+    }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+    }
+    .btn-outline:hover { background: #f3f4f6; }
+    .btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+    .spinner {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn.loading .spinner { display: block; }
+    .btn.loading .btn-label { opacity: .7; }
+
+    .status-msg {
+      font-size: 12.5px;
+      font-weight: 500;
+      padding: 7px 14px;
+      border-radius: 6px;
+      display: none;
+    }
+    .status-msg.show { display: inline-flex; align-items: center; gap: 6px; }
+    .status-msg.ok { background: #dcfce7; color: #166534; }
+    .status-msg.err { background: #fee2e2; color: #991b1b; }
+    .status-msg.info { background: #dbeafe; color: #1e40af; }
+
+    /* ── Log viewer ── */
+    .log-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .log-live {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--success);
+    }
+    .log-live::before {
+      content: '';
+      width: 7px; height: 7px;
+      background: var(--success);
+      border-radius: 50%;
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .3; }
+    }
+    .log-box {
+      background: #0f1117;
+      border-radius: 8px;
+      padding: 16px;
+      height: 260px;
+      overflow-y: auto;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      color: #9ca3af;
+      border: 1px solid #1f2937;
+    }
+    .log-box::-webkit-scrollbar { width: 6px; }
+    .log-box::-webkit-scrollbar-track { background: transparent; }
+    .log-box::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+    .log-line { display: block; }
+    .log-line.ok { color: #86efac; }
+    .log-line.err { color: #fca5a5; }
+    .log-line.check { color: #93c5fd; }
+    .log-line.warn { color: #fde68a; }
+    .log-empty { color: #4b5563; font-style: italic; }
+
+    /* ── Section header ── */
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin: 28px 0 14px;
+    }
+    .section-title:first-child { margin-top: 0; }
+
+    /* ── Next run badge ── */
+    #next-run-badge {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-left: auto;
+    }
+    #next-run-badge strong { color: var(--text); }
+  </style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-brand">
+    <span class="masthead-title">TS Weekly — Tech Check</span>
+    <span class="masthead-sub">Newsletter Config</span>
+  </div>
+  <span class="masthead-pill" id="next-run-badge">Loading schedule…</span>
+</header>
+
+<main class="page">
+
+  <!-- Row 1: Schedule + Model -->
+  <div class="grid-2">
+
+    <div class="card">
+      <div class="card-label">Schedule</div>
+      <div class="field row-3">
+        <div>
+          <label>Day of week</label>
+          <select id="day_of_week">
+            <option value="mon">Monday</option>
+            <option value="tue">Tuesday</option>
+            <option value="wed">Wednesday</option>
+            <option value="thu">Thursday</option>
+            <option value="fri">Friday</option>
+            <option value="sat">Saturday</option>
+            <option value="sun" selected>Sunday</option>
+          </select>
+        </div>
+        <div>
+          <label>Hour (ET)</label>
+          <select id="hour"></select>
+        </div>
+        <div>
+          <label>Minute</label>
+          <select id="minute">
+            <option value="0">:00</option>
+            <option value="15">:15</option>
+            <option value="30">:30</option>
+            <option value="45">:45</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Recipient email</label>
+        <input type="email" id="recipient" placeholder="recipient@example.com">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Model</div>
+      <div class="field model-search-wrap">
+        <label>Search models</label>
+        <input type="text" id="model-search" placeholder="Filter free models…">
+        <label>Select model</label>
+        <select id="model-select" size="6" style="height:auto; padding:4px 0;"></select>
+        <div class="model-count" id="model-count">Loading…</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Row 2: Prompt -->
+  <div style="margin-top:20px;">
+    <div class="card">
+      <div class="card-label">Editorial Prompt</div>
+      <div class="field">
+        <label>Instructions sent to the LLM after the article list</label>
+        <textarea id="prompt" spellcheck="false"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="card" style="margin-top:20px;">
+    <div class="actions">
+      <button class="btn btn-primary" id="btn-save" onclick="saveConfig()">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M13.5 4.5l-9 9L1 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 2h8l3 3v9a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        <span class="btn-label">Save Config</span>
+        <span class="spinner"></span>
+      </button>
+      <button class="btn btn-outline" id="btn-run" onclick="runNow()">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5 3l8 5-8 5V3z" fill="currentColor"/></svg>
+        <span class="btn-label">Run Now</span>
+        <span class="spinner" style="border-color:rgba(0,0,0,.15);border-top-color:#111;"></span>
+      </button>
+      <span class="status-msg" id="status-msg"></span>
+    </div>
+  </div>
+
+  <!-- Log viewer -->
+  <div style="margin-top:20px;">
+    <div class="card">
+      <div class="log-header">
+        <div class="card-label" style="margin-bottom:0;">Run Log</div>
+        <span class="log-live">Live</span>
+      </div>
+      <div class="log-box" id="log-box">
+        <span class="log-empty">No log entries yet.</span>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ── Populate hour dropdown ──────────────────────────────────────────────────
+const hourSel = document.getElementById('hour');
+for (let h = 0; h < 24; h++) {
+  const ampm = h < 12 ? 'AM' : 'PM';
+  const label = h === 0 ? '12 AM' : h < 12 ? `${h} AM` : h === 12 ? '12 PM' : `${h-12} PM`;
+  const opt = document.createElement('option');
+  opt.value = h;
+  opt.textContent = label;
+  if (h === 21) opt.selected = true;
+  hourSel.appendChild(opt);
+}
+
+// ── Load config ─────────────────────────────────────────────────────────────
+async function loadConfig() {
+  const res = await fetch('/api/config');
+  const cfg = await res.json();
+  document.getElementById('day_of_week').value = cfg.day_of_week || 'sun';
+  document.getElementById('hour').value = cfg.hour ?? 21;
+  document.getElementById('minute').value = cfg.minute ?? 0;
+  document.getElementById('recipient').value = cfg.recipient || '';
+  document.getElementById('prompt').value = cfg.prompt || '';
+  updateNextRunBadge(cfg);
+
+  // Set model after models load
+  window._pendingModel = cfg.model;
+}
+
+function updateNextRunBadge(cfg) {
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const dayIdx = {mon:1,tue:2,wed:3,thu:4,fri:5,sat:6,sun:0}[cfg.day_of_week] ?? 0;
+  const h = cfg.hour ?? 21, m = cfg.minute ?? 0;
+  const ampm = h < 12 ? 'AM' : 'PM';
+  const hLabel = h === 0 ? 12 : h > 12 ? h-12 : h;
+  const mLabel = String(m).padStart(2,'0');
+  document.getElementById('next-run-badge').innerHTML =
+    `Next: <strong>${days[dayIdx]} ${hLabel}:${mLabel} ${ampm} ET</strong>`;
+}
+
+// ── Load models ─────────────────────────────────────────────────────────────
+let allModels = [];
+async function loadModels() {
+  const res = await fetch('/api/models');
+  if (!res.ok) { document.getElementById('model-count').textContent = 'Failed to load models.'; return; }
+  allModels = await res.json();
+  renderModels(allModels);
+  if (window._pendingModel) {
+    document.getElementById('model-select').value = window._pendingModel;
+  }
+}
+
+function renderModels(models) {
+  const sel = document.getElementById('model-select');
+  const current = sel.value;
+  sel.innerHTML = '';
+  models.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.id;
+    opt.textContent = `${m.name}`;
+    sel.appendChild(opt);
+  });
+  if (current) sel.value = current;
+  if (!sel.value && models.length) sel.value = models[0].id;
+  document.getElementById('model-count').textContent = `${models.length} free model${models.length !== 1 ? 's' : ''} available`;
+}
+
+document.getElementById('model-search').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  renderModels(allModels.filter(m => m.name.toLowerCase().includes(q) || m.id.toLowerCase().includes(q)));
+});
+
+// ── Save config ─────────────────────────────────────────────────────────────
+async function saveConfig() {
+  const btn = document.getElementById('btn-save');
+  setLoading(btn, true);
+  const cfg = {
+    day_of_week: document.getElementById('day_of_week').value,
+    hour: parseInt(document.getElementById('hour').value),
+    minute: parseInt(document.getElementById('minute').value),
+    recipient: document.getElementById('recipient').value,
+    model: document.getElementById('model-select').value,
+    prompt: document.getElementById('prompt').value,
+  };
+  try {
+    const res = await fetch('/api/config', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(cfg) });
+    const data = await res.json();
+    setLoading(btn, false);
+    if (data.status === 'saved') {
+      showStatus('ok', '✓ Config saved');
+      updateNextRunBadge(cfg);
+    } else {
+      showStatus('err', 'Save failed');
+    }
+  } catch(e) {
+    setLoading(btn, false);
+    showStatus('err', 'Network error');
+  }
+}
+
+// ── Run now ──────────────────────────────────────────────────────────────────
+async function runNow() {
+  const btn = document.getElementById('btn-run');
+  setLoading(btn, true);
+  showStatus('info', '⏳ Newsletter running…');
+  try {
+    const res = await fetch('/api/run', { method:'POST' });
+    const data = await res.json();
+    setLoading(btn, false);
+    if (data.status === 'started') {
+      showStatus('info', '⏳ Running — check log below');
+    } else if (data.status === 'already_running') {
+      showStatus('warn', '⚠ Already running');
+    }
+  } catch(e) {
+    setLoading(btn, false);
+    showStatus('err', 'Failed to start');
+  }
+}
+
+// ── Log polling ──────────────────────────────────────────────────────────────
+let lastLogCount = 0;
+async function pollLogs() {
+  try {
+    const res = await fetch('/api/logs');
+    const data = await res.json();
+    const lines = data.lines || [];
+    if (lines.length === lastLogCount) return;
+    lastLogCount = lines.length;
+    const box = document.getElementById('log-box');
+    if (!lines.length) {
+      box.innerHTML = '<span class="log-empty">No log entries yet.</span>';
+      return;
+    }
+    box.innerHTML = lines.map(line => {
+      let cls = '';
+      if (line.includes('Done.') || line.includes('-> True') || line.includes('Sending email')) cls = 'ok';
+      else if (line.includes('failed') || line.includes('Failed') || line.includes('Error') || line.includes('-> False')) cls = 'err';
+      else if (line.includes('check_url')) cls = 'check';
+      else if (line.includes('Warning') || line.includes('Broken')) cls = 'warn';
+      return `<span class="log-line ${cls}">${escHtml(line)}</span>`;
+    }).join('\n');
+    box.scrollTop = box.scrollHeight;
+  } catch(_) {}
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── UI helpers ────────────────────────────────────────────────────────────────
+function setLoading(btn, on) {
+  btn.disabled = on;
+  btn.classList.toggle('loading', on);
+}
+
+let statusTimer;
+function showStatus(type, msg) {
+  const el = document.getElementById('status-msg');
+  el.className = `status-msg show ${type}`;
+  el.textContent = msg;
+  clearTimeout(statusTimer);
+  if (type !== 'info') statusTimer = setTimeout(() => el.classList.remove('show'), 4000);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+loadConfig();
+loadModels();
+pollLogs();
+setInterval(pollLogs, 5000);
+</script>
+</body>
+</html>

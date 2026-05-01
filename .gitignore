@@ -1,0 +1,6 @@
+.env
+config.json
+tech_check.log
+__pycache__/
+*.pyc
+.DS_Store

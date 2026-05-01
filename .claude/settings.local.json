@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(chmod +x *)",
+      "Bash(curl -s \"https://news.mit.edu/rss/topic/technology\")",
+      "Bash(crontab *)",
+      "Bash(pip3 install *)"
+    ]
+  }
+}
