@@ -5,6 +5,9 @@ import threading
 import urllib.request
 from datetime import datetime
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from flask import Flask, jsonify, render_template, request
