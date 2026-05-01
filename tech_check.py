@@ -18,7 +18,7 @@ from datetime import datetime, timezone, timedelta
 OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
 MAILGUN_API_KEY = os.environ.get("MAILGUN_API_KEY", "")
 MAILGUN_DOMAIN = os.environ.get("MAILGUN_DOMAIN", "")
-RECIPIENT_EMAIL = "hanielthomson@gmail.com"
+RECIPIENT_EMAIL = "sujathom@gmail.com"
 DEFAULT_MODEL = "openai/gpt-oss-120b:free"
 
 RSS_FEEDS = {

@@ -51,7 +51,7 @@ DEFAULT_CONFIG = {
     "day_of_week": "sun",
     "hour": 21,
     "minute": 0,
-    "recipient": "hanielthomson@gmail.com",
+    "recipient": "sujathom@gmail.com",
 }
 
 scheduler = BackgroundScheduler(timezone="America/New_York")
