@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import threading
 import urllib.request
 from datetime import datetime
@@ -15,6 +16,29 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG_FILE = os.path.join(BASE_DIR, "config.json")
 LOG_FILE = os.path.join(BASE_DIR, "tech_check.log")
+
+
+class _Tee:
+    def __init__(self, stream, path):
+        self._stream = stream
+        self._lock = threading.Lock()
+        self._path = path
+
+    def write(self, data):
+        self._stream.write(data)
+        self._stream.flush()
+        with self._lock:
+            with open(self._path, "a") as f:
+                f.write(data)
+
+    def flush(self):
+        self._stream.flush()
+
+    def __getattr__(self, name):
+        return getattr(self._stream, name)
+
+
+sys.stdout = _Tee(sys.__stdout__, LOG_FILE)
 
 DAY_MAP = {"mon": 0, "tue": 1, "wed": 2, "thu": 3, "fri": 4, "sat": 5, "sun": 6}
 
